@@ -57,7 +57,7 @@ plugins:
 
 author:
   name   : "Shay Lo Yuki"
-  avatar : "/assets/images/bio-photo.jpg"
+  avatar : "/assets/images/my-avatar-icon.png"
   bio    : "Life fortunes the brave."
   links:
     - label: "Website"
