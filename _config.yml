@@ -13,7 +13,7 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: shayloyuki
+title: Shay Lo Yuki
 email: shayluo@icloud.com
 description: >- # this means to ignore newlines until "baseurl:"
   This is shayloyuki's portfolio, about code, books and thingking.
@@ -56,16 +56,19 @@ plugins:
   - jekyll-include-cache
 
 author:
-  name   : "Shay Lo Yuki"
+  #name   : "Shay Lo Yuki"
   avatar : "/assets/images/my-avatar-icon.png"
   bio    : "Life fortunes the brave."
   links:
-    - label: "Website"
-      icon: "fas fa-fw fa-link"
-      url: "https://shayloyuki.github.io/shayloyuki/"
+    #- label: "Website"
+      #icon: "fas fa-fw fa-link"
+      #url: "https://shayloyuki.github.io/shayloyuki/"
     #- label: "Twitter"
       #icon: "fab fa-fw fa-twitter-square"
       #url: "https://twitter.com/"
+    - label: "Email"
+      icon: "fab fa-fw fa-envelope-square"
+      url: "mailto:shayluo@icloud.com"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/shayloyuki"
