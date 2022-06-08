@@ -2,7 +2,7 @@
 title: "理想生活"
 date: 2022-06-08
 categories: 
-  -blog
+  - blog
 tags:
   - life
 ---
