@@ -1,0 +1,74 @@
+<!--
+ * @Author: luoxue
+ * @Date: 2022-10-08 10:24:36
+ * @LastEditors: luoxue
+ * @LastEditTime: 2022-10-08 15:13:39
+ * @FilePath: \shayloyuki.github.io\_posts\2022-10-08-er-ci-feng-zhuang-dao-ru-zu-jian.md
+ * @Description: 
+-->
+---
+title: "二次封装导入组件"
+date: 2022-10-08
+categories:
+  - blog
+tags:
+  - Element-Ui
+  - Components
+---
+
+# 需求
+
+根据 Element-Ui 组件库，二次封装导入组件，包含以下功能：
+
+1. 上传文件按钮；
+2. 若有需要，可实时显示导入进度。
+
+# 分析
+
+1. 后端给了两个接口：一是上传文件的接口 `A`，二是查询导入进度的接口 `B`。
+    
+    > 注意：需要显示的是导入数据库的进度，而不是上传文件的进度，二者是不同的。
+    
+2. 轮询时机：
+   >*不是接口 `A` 调用成功后才轮询接口 `B`，这样会导致无法实时显示进度。*
+    **正确做法是：调用 `A` 接口的同时，就开始轮询 `B` 接口，一旦导入进度为 `100%` 就停止轮询，显示导入成功。**
+
+    A接口的触发时间点是点击导入按钮时，那么就在 `data` 中声明 `isUploading` 正在导入状态，调用A接口的时候就开始轮询B接口。
+
+    ![image](../assets/images/2022-10-08-er-ci-feng-zhuang-dao-ru-zu-jian/uploadFile.png)
+
+    ![image](../assets/images/2022-10-08-er-ci-feng-zhuang-dao-ru-zu-jian/watch%20isUploading.png)
+
+    ![image](../assets/images/2022-10-08-er-ci-feng-zhuang-dao-ru-zu-jian/loopProgress.png)
+
+3. 坑：进度条不显示导入成功。
+    >进度条等不到显示 `100% 导入成功`就会消失的原因是：之前在调用接口 `A` 成功后就设置 `isUploading = false`，而此时还在轮询接口 `B`，`percentage` 还不到100。
+    
+      ![image](../assets/images/2022-10-08-er-ci-feng-zhuang-dao-ru-zu-jian/el-progress.png)
+
+      **解决办法：在 `percentage` 达到100之后，再设置 `isUploading = false` 令进度条消失。**
+
+      **注意：在让进度条消失之前，要先清除轮询定时器，并且过1秒钟再让进度条消失（这样会让完成画面定格在界面上一会儿，提示用户）。**
+
+      ![image](../assets/images/2022-10-08-er-ci-feng-zhuang-dao-ru-zu-jian/watch%20percentage.png)
+
+
+4. 把两个接口封装在组件的 `js` 文件内，这样使用该组件时只需要传入接口地址即可，不需重复书写封装接口代码。
+
+# 演示代码
+
+[codeSandbox 演示代码](https://codesandbox.io/s/er-ci-feng-zhuang-import-zu-jian-forked-yo4s87?file=/src/main.js)
+
+# 总结
+
+1. 传递接口地址给组件，提高封装组件的灵活性；
+2. `el-upload` 组件，采用  `http-request` 自定义上传方式。上传接口是数据格式是  `multipart/form-data` 时，要单独设置 `Content-Type`，传参也要转为 `formdata` 格式，`formData.append(参数名, this.file)`；
+3. `el-progress` 自定义显示数据使用 `format`属性；
+4. 轮询导入进度：`window.setInterval(() => {setTimeout(() => {// 调用接口}, 0)}, 1000)`。清除定时器：`clearInterval(定时器名称)`。
+
+
+# 参考链接
+
+1. [封装upLoad组件，自定义上传方法](https://juejin.cn/post/7031884699115094053 "封装upLoad组件，自定义上传方法")
+2. [element-ui中 Progress 圆形进度条 自定义文字 底色 圆角 文字颜色等修改](https://blog.csdn.net/weixin_45045099/article/details/125891783?spm=1001.2101.3001.6650.6&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-6-125891783-blog-106373868.t0_searchtargeting_v1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-6-125891783-blog-106373868.t0_searchtargeting_v1&utm_relevant_index=7 "element-ui中 Progress 圆形进度条 自定义文字 底色 圆角 文字颜色等修改")
+3. [element的遮罩层v-loading，隐藏上面的文字和图标，添加自定义内容](https://blog.csdn.net/qq_42376171/article/details/124591090?ops_request_misc=&request_id=&biz_id=102&utm_term=v-loading%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%A0%B7%E5%BC%8F&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-8-124591090.142%5ev42%5epc_ran_alice,185%5ev2%5etag_show&spm=1018.2226.3001.4187 "element的遮罩层v-loading，隐藏上面的文字和图标，添加自定义内容")
